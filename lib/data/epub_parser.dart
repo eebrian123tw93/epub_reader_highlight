@@ -69,7 +69,7 @@ ParseParagraphsResult parseParagraphs(
           return acc;
         }
 
-        chapterIndexes.add(index);
+        chapterIndexes.add(acc.length+index);
         acc.addAll(elmList
             .map((element) => Paragraph(element, chapterIndexes.length - 1)));
         return acc;
