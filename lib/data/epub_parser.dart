@@ -22,11 +22,23 @@ List<dom.Element> _removeAllDiv(List<dom.Element> elements) {
   final List<dom.Element> result = [];
 
   for (final node in elements) {
-    if (node.localName == 'div' && node.children.length > 1) {
+    if (node.localName == 'div' && node.children.isNotEmpty) {
+      // 遞迴處理子節點
       result.addAll(_removeAllDiv(node.children));
     } else {
+      // 保留非 div 節點
       result.add(node);
     }
+
+    // // 處理非元素節點 (例如文字節點)
+    // for (final subNode in node.nodes) {
+    //   if (subNode is! dom.Element) {
+    //     // 將非元素節點加入結果
+    //     final pElement = dom.Element.tag('p');
+    //     pElement.text = subNode.text; // 將 div 的內容作為 p 的文字
+    //     result.add(pElement);
+    //   }
+    // }
   }
 
   return result;
@@ -69,7 +81,7 @@ ParseParagraphsResult parseParagraphs(
           return acc;
         }
 
-        chapterIndexes.add(acc.length+index);
+        chapterIndexes.add(acc.length + index);
         acc.addAll(elmList
             .map((element) => Paragraph(element, chapterIndexes.length - 1)));
         return acc;
