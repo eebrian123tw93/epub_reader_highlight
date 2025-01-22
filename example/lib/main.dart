@@ -21,7 +21,7 @@ class _MainAppState extends State<MainApp> {
   void initState() {
     super.initState();
     _epubReaderController = EpubController(
-      document: EpubDocument.openAsset('assets/55a.epub'),
+      document: EpubDocument.openAsset('assets/123.epub'),
     );
   }
 

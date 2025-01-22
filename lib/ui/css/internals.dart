@@ -2,6 +2,7 @@
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:html_unescape/html_unescape.dart';
 import 'package:xml/xml_events.dart' as xmle;
 
 import './utils.dart';
@@ -81,8 +82,10 @@ class Parser {
               _linksCallback(link);
             });
     }
-    
-    return TextSpan(style: textStyle, text: text.replaceAll("&nbsp;", " "));
+    HtmlUnescape unescape = HtmlUnescape();
+
+    String decodedString = unescape.convert(text);
+    return TextSpan(style: textStyle, text: decodedString);
   }
 
   TextSpan _handleText(String text) {
@@ -113,7 +116,8 @@ class Parser {
               event.name == 's') {
             styles = "text-decoration: line-through;";
           } else if (event.name == 'a') {
-            styles = "visit_link:__#TO_GET#__;text-decoration: underline; color: #0000ff";
+            styles =
+                "visit_link:__#TO_GET#__;text-decoration: underline; color: #0000ff";
           }
 
           if (event.name == 'tgYellow') {
