@@ -81,7 +81,8 @@ class Parser {
               _linksCallback(link);
             });
     }
-    return TextSpan(style: textStyle, text: text);
+    
+    return TextSpan(style: textStyle, text: text.replaceAll("&nbsp;", " "));
   }
 
   TextSpan _handleText(String text) {
