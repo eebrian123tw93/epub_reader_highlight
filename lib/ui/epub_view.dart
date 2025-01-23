@@ -105,7 +105,7 @@ class _EpubViewState extends State<EpubView> {
   void dispose() {
     _itemPositionListener!.itemPositions.removeListener(_changeListener);
     _controller._detach();
-    if (widget.paragraphIndexOnDispose != null) {
+    if (widget.paragraphIndexOnDispose != null && _controller.currentValue != null) {
       widget.paragraphIndexOnDispose!(
         _controller.currentValue!.paragraphNumber,
       );
