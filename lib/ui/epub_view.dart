@@ -601,6 +601,21 @@ class _EpubViewState extends State<EpubView> {
         ),
       );
 
+  Widget _page_buildLoaded(BuildContext context) => PageView.builder(
+      itemCount: _paragraphs.length,
+      itemBuilder: (BuildContext context, int index) =>
+          widget.builders.chapterBuilder(
+            context,
+            widget.builders,
+            widget.controller._document!,
+            _chapters,
+            _paragraphs,
+            index,
+            _getChapterIndexBy(positionIndex: index),
+            _getParagraphIndexBy(positionIndex: index),
+            _onLinkPressed,
+          ));
+
   static Widget _builder(
     BuildContext context,
     EpubViewBuilders builders,
@@ -647,7 +662,7 @@ class _EpubViewState extends State<EpubView> {
         context,
         widget.builders,
         _controller.loadingState.value,
-        _buildLoaded,
+        _page_buildLoaded,
         _loadingError,
       );
 
