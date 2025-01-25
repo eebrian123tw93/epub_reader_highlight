@@ -34,7 +34,7 @@ class EpubCfiGenerator {
     String elementStep = '';
 
     int index = 0;
-    for (var node in currentNode.parent!.children) {
+    for (var node in (currentNode.parent?.children ?? [])) {
       if (node == currentNode) {
         currentNodePosition = index;
       }
