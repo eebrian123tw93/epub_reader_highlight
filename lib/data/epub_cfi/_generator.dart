@@ -49,14 +49,16 @@ class EpubCfiGenerator {
       elementStep = '/$cfiPosition';
     }
 
-    final parentNode = currentNode.parent!;
-    if (parentNode.localName == topLevelElement ||
+    final parentNode = currentNode.parent;
+    if (parentNode?.localName == topLevelElement ||
         currentNode.localName == topLevelElement) {
       if (topLevelElement == 'html') {
         return '!$elementStep';
       } else {
         return elementStep;
       }
+    } else if (parentNode == null) {
+      return elementStep;
     } else {
       return createCFIElementSteps(parentNode, topLevelElement) + elementStep;
     }
