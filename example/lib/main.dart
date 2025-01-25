@@ -57,7 +57,7 @@ class _MainAppState extends State<MainApp> {
                     color: Colors.amber,
                   ),
                 ),
-                chapterDividerBuilder: (_) => Container(),
+                chapterDividerBuilder: (chapter, index) => Container(),
               ),
               onHighlightTap: (selectedTextModel) {
                 debugPrint('Highlighted Text: $selectedTextModel');

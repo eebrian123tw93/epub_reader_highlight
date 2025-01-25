@@ -318,7 +318,7 @@ class _EpubViewState extends State<EpubView> {
     return posIndex;
   }
 
-  static Widget _chapterDividerBuilder(EpubChapter chapter) => Container(
+  static Widget _chapterDividerBuilder(EpubChapter chapter, int index) => Container(
         height: 56,
         width: double.infinity,
         padding: const EdgeInsets.all(16),
@@ -512,7 +512,7 @@ class _EpubViewState extends State<EpubView> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (chapterIndex >= 0 && paragraphIndex == 0)
-          builders.chapterDividerBuilder(chapters[chapterIndex]),
+          builders.chapterDividerBuilder(chapters[chapterIndex], index),
         if (hasText && !hasImage)
           Padding(
             padding: options.paragraphPadding as EdgeInsets? ?? EdgeInsets.zero,

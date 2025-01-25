@@ -24,7 +24,7 @@ typedef ChaptersBuilder = Widget Function(
   ExternalLinkPressed onExternalLinkPressed,
 );
 
-typedef ChapterDividerBuilder = Widget Function(EpubChapter value);
+typedef ChapterDividerBuilder = Widget Function(EpubChapter value, int index);
 
 class EpubViewBuilders<T> {
   final EpubViewBuilder<T> builder;
