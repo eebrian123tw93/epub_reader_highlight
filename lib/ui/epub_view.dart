@@ -512,7 +512,7 @@ class _EpubViewState extends State<EpubView> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (chapterIndex >= 0 && paragraphIndex == 0)
-          builders.chapterDividerBuilder(chapters[chapterIndex], index),
+          builders.chapterDividerBuilder(chapters[chapterIndex], chapterIndex),
         if (hasText && !hasImage)
           Padding(
             padding: options.paragraphPadding as EdgeInsets? ?? EdgeInsets.zero,
