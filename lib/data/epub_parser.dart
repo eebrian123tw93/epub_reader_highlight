@@ -28,6 +28,7 @@ List<dom.Element> _removeAllDiv(List<dom.Element> elements) {
       for (final subNode in node.nodes) {
         if (subNode is! dom.Element) {
           final pElement = dom.Element.tag('p');
+          pElement.parentNode = node;
           pElement.text = subNode.text; // 將 div 的內容作為 p 的文字
           result.add(pElement);
         } else {
