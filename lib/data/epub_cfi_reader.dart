@@ -61,6 +61,7 @@ class EpubCfiReader {
       document.documentElement!,
       cfiFragment.path!.localPath!,
     );
+
     final int? paragraphNumber = getParagraphIndexByElement(element);
 
     return paragraphNumber;
@@ -159,6 +160,8 @@ class EpubCfiReader {
           chapter.ContentFileName!.contains(cfiStep.idAssertion!),
     );
 
+
+
     if (index == -1) {
       return null;
     }
@@ -167,7 +170,7 @@ class EpubCfiReader {
   }
 
   int? getParagraphIndexByElement(dom.Element? element) {
-    if (element == null) {
+    if (element == null || element.localName?.toLowerCase() == 'html') {
       return null;
     }
 

@@ -1,5 +1,6 @@
 import 'package:epubx/epubx.dart';
 import 'package:html/dom.dart';
+import 'package:html/dom.dart' as dom;
 
 class EpubCfiGenerator {
   const EpubCfiGenerator();
@@ -11,10 +12,15 @@ class EpubCfiGenerator {
       EpubChapter chapter, EpubPackage? packageDocument) async {
     validatePackageDocument(packageDocument, chapter.Anchor);
 
+
+
     final index = getIdRefIndex(chapter, packageDocument!);
+
+    String? href = packageDocument.Manifest?.Items?.firstWhere((item)=>item.Id == packageDocument.Spine!.Items![index].IdRef).Href;
+
     final pos = getIdRefPosition(index);
     final spineIdRef = index >= 0
-        ? packageDocument.Spine!.Items![index].IdRef
+        ? href ?? packageDocument.Spine!.Items![index].IdRef
         : chapter.Anchor;
 
     return '/6/$pos[$spineIdRef]!';
@@ -72,7 +78,8 @@ class EpubCfiGenerator {
 
     if (chapter.Anchor == null) {
       // filename w/o extension
-      edRef = _fileNameAsChapterName(chapter.ContentFileName!);
+      String? idInManifest = packageDocument.Manifest?.Items?.firstWhere((item)=>item.Href == chapter.ContentFileName).Id;
+      edRef = idInManifest ?? _fileNameAsChapterName(chapter.ContentFileName!);
     }
 
     for (var i = 0; i < items.length; i++) {
@@ -84,7 +91,6 @@ class EpubCfiGenerator {
         partIndex = i;
       }
     }
-
     return index >= 0 ? index : partIndex;
   }
 
