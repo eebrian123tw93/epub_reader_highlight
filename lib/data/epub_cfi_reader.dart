@@ -170,7 +170,7 @@ class EpubCfiReader {
   }
 
   int? getParagraphIndexByElement(dom.Element? element) {
-    if (element == null) {
+    if (element == null || element.localName?.toLowerCase() == 'html') {
       return null;
     }
 
