@@ -16,7 +16,10 @@ class EpubCfiGenerator {
 
     final index = getIdRefIndex(chapter, packageDocument!);
 
-    String? href = packageDocument.Manifest?.Items?.firstWhere((item)=>item.Id == packageDocument.Spine!.Items![index].IdRef).Href;
+    String? href;
+    if (index >= 0) {
+      href = packageDocument.Manifest?.Items?.firstWhere((item)=>item.Id == packageDocument.Spine!.Items![index].IdRef).Href;
+    }
 
     final pos = getIdRefPosition(index);
     final spineIdRef = index >= 0
@@ -40,15 +43,28 @@ class EpubCfiGenerator {
     String elementStep = '';
 
     int index = 0;
-    for (var node in (currentNode.parent?.nodes ?? [])) {
-      if (node is dom.Text && currentNode.text == node.text) {
-        currentNodePosition = index;
-      }
+    for (var node in (currentNode.parent?.children ?? [])) {
       if (node == currentNode) {
         currentNodePosition = index;
       }
       index++;
     }
+
+    if (currentNodePosition == 0) {
+      index = 0;
+      for (var node in (currentNode.parent?.nodes ?? [])) {
+        if (node == currentNode) {
+          currentNodePosition = index;
+        } else if (node is dom.Text && currentNode.text == node.text) {
+          currentNodePosition = index;
+        } else if (node is dom.Element && node.localName?.toLowerCase() == 'br') {
+          continue;
+        }
+        index++;
+      }
+    }
+
+
 
     final int cfiPosition = (currentNodePosition + 1) * 2;
 

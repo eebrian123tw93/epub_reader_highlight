@@ -57,6 +57,9 @@ class EpubCfiReader {
     if (document == null) {
       return null;
     }
+
+    wrapTextNodes(document.body!);
+    
     final element = EpubCfiInterpreter().searchLocalPathForHref(
       document.documentElement!,
       cfiFragment.path!.localPath!,
@@ -182,5 +185,27 @@ class EpubCfiReader {
     }
 
     return index;
+  }
+
+  void wrapTextNodes(dom.Node node) {
+    if (node is dom.Element && node.localName != 'p') {
+      // 遞歸處理子節點
+      for (var i = node.nodes.length - 1; i >= 0; i--) {
+        wrapTextNodes(node.nodes[i]);
+      }
+    } else if (node is dom.Text) {
+      if (node.text.trim().isNotEmpty) {
+        // 將 Text 節點包裝進 <p> 標籤
+        var paragraph = dom.Element.tag('p');
+        paragraph.text = node.text;
+        node.replaceWith(paragraph);
+      } else {
+        // 移除空白節點
+        node.remove();
+      }
+    } else if (node is dom.Element && node.localName == 'br') {
+      // 移除 <br> 標籤
+      node.remove();
+    }
   }
 }
