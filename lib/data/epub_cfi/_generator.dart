@@ -74,7 +74,12 @@ class EpubCfiGenerator {
       elementStep = '/$cfiPosition';
     }
 
-    final parentNode = currentNode.parent;
+    var parentNode = currentNode.parent;
+
+    if (parentNode?.localName == 'div') {
+      parentNode = parentNode?.parent;
+    }
+
     if (parentNode?.localName == topLevelElement ||
         currentNode.localName == topLevelElement) {
       if (topLevelElement == 'html') {
