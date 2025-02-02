@@ -1,5 +1,6 @@
 import 'package:epubx/epubx.dart';
 import 'package:html/dom.dart';
+import 'package:html/dom.dart' as dom;
 
 class EpubCfiGenerator {
   const EpubCfiGenerator();
@@ -11,10 +12,18 @@ class EpubCfiGenerator {
       EpubChapter chapter, EpubPackage? packageDocument) async {
     validatePackageDocument(packageDocument, chapter.Anchor);
 
+
+
     final index = getIdRefIndex(chapter, packageDocument!);
+
+    String? href;
+    if (index >= 0) {
+      href = packageDocument.Manifest?.Items?.firstWhere((item)=>item.Id == packageDocument.Spine!.Items![index].IdRef).Href;
+    }
+
     final pos = getIdRefPosition(index);
     final spineIdRef = index >= 0
-        ? packageDocument.Spine!.Items![index].IdRef
+        ? href ?? packageDocument.Spine!.Items![index].IdRef
         : chapter.Anchor;
 
     return '/6/$pos[$spineIdRef]!';
@@ -41,6 +50,22 @@ class EpubCfiGenerator {
       index++;
     }
 
+    if (currentNodePosition == 0) {
+      index = 0;
+      for (var node in (currentNode.parent?.nodes ?? [])) {
+        if (node == currentNode) {
+          currentNodePosition = index;
+        } else if (node is dom.Text && currentNode.text == node.text) {
+          currentNodePosition = index;
+        } else if (node is dom.Element && node.localName?.toLowerCase() == 'br') {
+          continue;
+        }
+        index++;
+      }
+    }
+
+
+
     final int cfiPosition = (currentNodePosition + 1) * 2;
 
     if (currentNode.attributes.containsKey('id')) {
@@ -49,7 +74,12 @@ class EpubCfiGenerator {
       elementStep = '/$cfiPosition';
     }
 
-    final parentNode = currentNode.parent;
+    var parentNode = currentNode.parent;
+
+    if (parentNode?.localName == 'div') {
+      parentNode = parentNode?.parent;
+    }
+
     if (parentNode?.localName == topLevelElement ||
         currentNode.localName == topLevelElement) {
       if (topLevelElement == 'html') {
@@ -72,7 +102,8 @@ class EpubCfiGenerator {
 
     if (chapter.Anchor == null) {
       // filename w/o extension
-      edRef = _fileNameAsChapterName(chapter.ContentFileName!);
+      String? idInManifest = packageDocument.Manifest?.Items?.firstWhere((item)=>item.Href == chapter.ContentFileName).Id;
+      edRef = idInManifest ?? _fileNameAsChapterName(chapter.ContentFileName!);
     }
 
     for (var i = 0; i < items.length; i++) {
@@ -84,7 +115,6 @@ class EpubCfiGenerator {
         partIndex = i;
       }
     }
-
     return index >= 0 ? index : partIndex;
   }
 

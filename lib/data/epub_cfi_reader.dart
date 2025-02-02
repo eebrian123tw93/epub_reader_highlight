@@ -51,16 +51,20 @@ class EpubCfiReader {
     }
 
     final int chapterIndex =
-        _getChapterIndexBy(cfiStep: cfiFragment.path!.localPath!.steps!.first)!;
+    _getChapterIndexBy(cfiStep: cfiFragment.path!.localPath!.steps!.first)!;
     final chapter = chapters[chapterIndex];
     final document = chapterDocument(chapter);
     if (document == null) {
       return null;
     }
+
+    wrapTextNodes(document.body!);
+
     final element = EpubCfiInterpreter().searchLocalPathForHref(
       document.documentElement!,
       cfiFragment.path!.localPath!,
     );
+
     final int? paragraphNumber = getParagraphIndexByElement(element);
 
     return paragraphNumber;
@@ -103,7 +107,7 @@ class EpubCfiReader {
     );
 
     final contentDocumentCFIComponent =
-        generator.generateElementCFIComponent(currentNode);
+    generator.generateElementCFIComponent(currentNode);
 
     return generator.generateCompleteCFI([
       packageDocumentCFIComponent,
@@ -136,7 +140,8 @@ class EpubCfiReader {
     }
     final html = chapter.HtmlContent!.replaceAllMapped(
         RegExp(r'<\s*([^\s>]+)([^>]*)\/\s*>'),
-        (match) => '<${match.group(1)}${match.group(2)}></${match.group(1)}>');
+            (match) => '<${match.group(1)}${match.group(2)}></${match.group(
+            1)}>');
     final regExp = RegExp(
       r'<body.*?>.+?</body>',
       caseSensitive: false,
@@ -154,10 +159,11 @@ class EpubCfiReader {
     }
 
     final index = chapters.indexWhere(
-      (chapter) =>
-          chapter.Anchor == cfiStep.idAssertion ||
+          (chapter) =>
+      chapter.Anchor == cfiStep.idAssertion ||
           chapter.ContentFileName!.contains(cfiStep.idAssertion!),
     );
+
 
     if (index == -1) {
       return null;
@@ -167,17 +173,51 @@ class EpubCfiReader {
   }
 
   int? getParagraphIndexByElement(dom.Element? element) {
-    if (element == null) {
+    if (element == null || element.localName?.toLowerCase() == 'html') {
       return null;
     }
 
     final index = paragraphs.indexWhere(
-        (paragraph) => paragraph.element.outerHtml == element.outerHtml);
+            (paragraph) => paragraph.element.outerHtml == element.outerHtml);
 
     if (index == -1) {
       return null;
     }
 
     return index;
+  }
+
+  void wrapTextNodes(dom.Node node) {
+    if (node is dom.Element && node.localName == 'br') {
+      // 移除 <br> 標籤
+      node.remove();
+    } else if (node is dom.Element && node.localName == 'div') {
+      // 先遞歸處理 <div> 內的子節點
+      for (var i = node.nodes.length - 1; i >= 0; i--) {
+        wrapTextNodes(node.nodes[i]);
+      }
+
+      // 把 <div> 裡的子節點移到與 <div> 同一層
+      var parent = node.parent;
+      if (parent != null) {
+        var index = parent.nodes.indexOf(node);
+        parent.nodes.removeAt(index); // 先移除 <div>
+        parent.nodes.insertAll(index, node.nodes); // 把 <div> 內的內容插入原位置
+      }
+    } else if (node is dom.Element && node.localName != 'p') {
+      // 遞歸處理子節點
+      for (var i = node.nodes.length - 1; i >= 0; i--) {
+        wrapTextNodes(node.nodes[i]);
+      }
+    } else if (node is dom.Text) {
+      if (node.text.trim().isNotEmpty) {
+        // 將 Text 節點包裝進 <p> 標籤
+        var paragraph = dom.Element.tag('p')..text = node.text;
+        node.replaceWith(paragraph);
+      } else {
+        // 移除空白節點
+        node.remove();
+      }
+    }
   }
 }

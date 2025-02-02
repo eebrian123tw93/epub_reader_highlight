@@ -65,6 +65,12 @@ class _MainAppState extends State<MainApp> {
               paragraphIndexOnDispose: (paragraphIndex) {
                 debugPrint('Last paragraph Index: $paragraphIndex');
               },
+onChapterChanged: (value) async {
+                debugPrint(value?.chapter?.Title ?? "");
+                String? cfi = await _epubReaderController.generateEpubCfi() ?? "";
+                debugPrint(cfi);
+                _epubReaderController.gotoEpubCfi(cfi);
+              },
               controller: _epubReaderController,
             ),
           ),
